@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add a Round — Chandler Park 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+  :root{
+    --green:#0f3d2e;--green-deep:#0a2c21;--green-line:#2c5a48;
+    --cream:#f3efe2;--cream-dim:#cdd8cc;--gold:#c8a24a;--err:#d98a6a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#081a13;font-family:'EB Garamond',Georgia,serif;color:var(--cream);padding:32px 16px 64px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  .head{text-align:center;margin-bottom:28px;}
+  .head .kicker{letter-spacing:.42em;text-transform:uppercase;font-size:.72rem;color:var(--gold);margin-bottom:10px;}
+  .head h1{font-family:'Playfair Display',serif;font-weight:800;font-size:2rem;margin:0;}
+  .head p{color:var(--cream-dim);font-style:italic;max-width:600px;margin:10px auto 0;}
+
+  .panel{background:var(--green);border:2px solid var(--green-line);border-radius:6px;padding:24px 26px;margin-bottom:24px;box-shadow:0 10px 30px rgba(0,0,0,.4);}
+  .panel h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.3rem;margin:0 0 18px;}
+
+  .controls{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:flex-end;margin-bottom:22px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field label{font-variant:small-caps;letter-spacing:.1em;font-size:.85rem;color:var(--gold);}
+  input[type=text],input[type=date],select{
+    background:var(--green-deep);border:1px solid var(--green-line);color:var(--cream);
+    font-family:'EB Garamond',serif;font-size:1rem;padding:9px 11px;border-radius:4px;min-width:150px;
+  }
+  input:focus,select:focus{outline:2px solid var(--gold);outline-offset:1px;}
+
+  .holes{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;margin-bottom:8px;}
+  .holes.full{grid-template-columns:repeat(9,1fr);}
+  .hcell{display:flex;flex-direction:column;align-items:center;gap:4px;}
+  .hcell .hnum{font-size:.72rem;color:var(--cream-dim);}
+  .hcell .hpar{font-size:.64rem;color:var(--gold);opacity:.8;}
+  .hcell input{width:100%;min-width:0;text-align:center;padding:8px 2px;font-size:1.05rem;
+    background:var(--green-deep);border:1px solid var(--green-line);color:var(--cream);border-radius:4px;font-family:'EB Garamond',serif;}
+  .section-label{font-variant:small-caps;letter-spacing:.1em;color:var(--gold);font-size:.9rem;margin:16px 0 8px;}
+  .player-block{margin-bottom:18px;}
+  .player-block > .name{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:8px;}
+  .runtot{color:var(--cream-dim);font-size:.9rem;font-style:italic;margin-top:6px;}
+  .runtot b{color:var(--gold);font-style:normal;}
+
+  .btn{background:var(--gold);color:#0a2c21;border:none;font-family:'Playfair Display',serif;font-weight:700;
+    font-size:1rem;padding:12px 22px;border-radius:4px;cursor:pointer;letter-spacing:.02em;}
+  .btn:hover{filter:brightness(1.08);}
+  .btn.ghost{background:transparent;border:1px solid var(--green-line);color:var(--cream);}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;}
+
+  .out{margin-top:22px;}
+  .out h3{font-variant:small-caps;letter-spacing:.1em;color:var(--gold);font-size:.95rem;margin:0 0 8px;}
+  pre{background:var(--green-deep);border:1px solid var(--green-line);border-radius:4px;padding:16px;overflow-x:auto;
+    color:var(--cream);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.86rem;line-height:1.5;white-space:pre;}
+  .copied{color:var(--gold);font-size:.85rem;margin-left:10px;}
+  .note{color:var(--cream-dim);font-size:.86rem;font-style:italic;line-height:1.6;}
+  ol.steps{color:var(--cream-dim);font-size:.92rem;line-height:1.7;padding-left:20px;}
+  ol.steps code{background:var(--green-deep);padding:1px 6px;border-radius:3px;color:var(--cream);font-size:.85rem;}
+  .warn{color:var(--err);font-size:.86rem;margin-top:8px;min-height:1.2em;}
+
+  @media(max-width:560px){
+    .holes{grid-template-columns:repeat(3,1fr);}
+    .head h1{font-size:1.6rem;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <div class="kicker">Golf Detroit · Chandler Park 2026</div>
+    <h1>Add a Round</h1>
+    <p>Type the scores, hit generate, copy the block into <code>index.html</code>. No math, no hunting through code.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Round details</h2>
+    <div class="controls">
+      <div class="field">
+        <label for="date">Date</label>
+        <input type="text" id="date" placeholder="e.g. August 27, 2026">
+      </div>
+      <div class="field">
+        <label for="type">Holes</label>
+        <select id="type"><option value="18">18 holes</option><option value="9">9 holes</option></select>
+      </div>
+      <div class="field" id="nineField" style="display:none;">
+        <label for="nine">Which nine</label>
+        <select id="nine"><option value="Front">Front</option><option value="Back">Back</option></select>
+      </div>
+    </div>
+
+    <div class="player-block">
+      <div class="name">Ray</div>
+      <div id="rayHoles"></div>
+      <div class="runtot">Total: <b id="rayTot">—</b></div>
+    </div>
+
+    <div class="player-block">
+      <div class="name">Keith</div>
+      <div id="keithHoles"></div>
+      <div class="runtot">Total: <b id="keithTot">—</b></div>
+    </div>
+
+    <div class="warn" id="warn"></div>
+    <div class="btn-row">
+      <button class="btn" id="gen">Generate code block</button>
+      <button class="btn ghost" id="clear">Clear scores</button>
+    </div>
+  </div>
+
+  <div class="panel out" id="outPanel" style="display:none;">
+    <h3>Paste this into your <code>rounds</code> array <span class="copied" id="copied"></span></h3>
+    <pre id="code"></pre>
+    <button class="btn" id="copy">Copy to clipboard</button>
+    <div class="out" style="margin-top:24px;">
+      <h3>Where it goes</h3>
+      <ol class="steps">
+        <li>In your repo, open <code>index.html</code> and click the pencil (Edit).</li>
+        <li>Find the line <code>const rounds = [</code>.</li>
+        <li>Paste the block above just before the closing <code>];</code> of that array — after the last round.</li>
+        <li>Scroll down, click <b>Commit changes</b>. Your live page updates in about a minute.</li>
+      </ol>
+      <p class="note" id="calcNote"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const PAR_FULL=[4,5,4,4,3,5,3,4,4,4,4,4,4,5,3,3,4,4];
+const PAR_FRONT=PAR_FULL.slice(0,9);
+const PAR_BACK=PAR_FULL.slice(9);
+
+const typeSel=document.getElementById('type');
+const nineField=document.getElementById('nineField');
+const nineSel=document.getElementById('nine');
+const warn=document.getElementById('warn');
+
+function currentPars(){
+  if(typeSel.value==='18') return PAR_FULL;
+  return nineSel.value==='Front'?PAR_FRONT:PAR_BACK;
+}
+function holeNumbers(){
+  if(typeSel.value==='18') return Array.from({length:18},(_,i)=>i+1);
+  return nineSel.value==='Front'?[1,2,3,4,5,6,7,8,9]:[10,11,12,13,14,15,16,17,18];
+}
+
+function buildInputs(){
+  const pars=currentPars();
+  const nums=holeNumbers();
+  ['ray','keith'].forEach(who=>{
+    const host=document.getElementById(who+'Holes');
+    host.innerHTML='';
+    const grid=document.createElement('div');
+    grid.className='holes';
+    nums.forEach((n,i)=>{
+      const cell=document.createElement('div');
+      cell.className='hcell';
+      cell.innerHTML=`<span class="hnum">${n}</span><span class="hpar">par ${pars[i]}</span>
+        <input inputmode="numeric" data-who="${who}" data-i="${i}" maxlength="2">`;
+      grid.appendChild(cell);
+    });
+    host.appendChild(grid);
+  });
+  attachInputHandlers();
+  recalc();
+}
+
+function attachInputHandlers(){
+  document.querySelectorAll('.hcell input').forEach(inp=>{
+    inp.addEventListener('input',()=>{
+      inp.value=inp.value.replace(/[^0-9]/g,'');
+      recalc();
+      // auto-advance
+      if(inp.value.length>=1){
+        // no forced advance; golfers may type 10+
+      }
+    });
+  });
+}
+
+function readScores(who){
+  const inputs=[...document.querySelectorAll(`.hcell input[data-who="${who}"]`)];
+  return inputs.map(x=>x.value===''?null:parseInt(x.value,10));
+}
+function sum(a){return a.reduce((x,y)=>x+(y||0),0);}
+
+function recalc(){
+  ['ray','keith'].forEach(who=>{
+    const sc=readScores(who);
+    const filled=sc.filter(x=>x!==null).length;
+    const t=sum(sc);
+    document.getElementById(who+'Tot').textContent = filled? `${t}${filled<sc.length?` (${filled}/${sc.length} holes)`:''}` : '—';
+  });
+}
+
+typeSel.addEventListener('change',()=>{
+  nineField.style.display = typeSel.value==='9'?'flex':'none';
+  buildInputs();
+});
+nineSel.addEventListener('change',buildInputs);
+
+document.getElementById('clear').addEventListener('click',()=>{
+  document.querySelectorAll('.hcell input').forEach(i=>i.value='');
+  recalc();
+  warn.textContent='';
+});
+
+document.getElementById('gen').addEventListener('click',()=>{
+  warn.textContent='';
+  const date=document.getElementById('date').value.trim();
+  const is18=typeSel.value==='18';
+  const ray=readScores('ray');
+  const keith=readScores('keith');
+
+  if(!date){warn.textContent='Add a date first.';return;}
+  const need=is18?18:9;
+  const rayFilled=ray.filter(x=>x!==null).length;
+  const keithFilled=keith.filter(x=>x!==null).length;
+  if(rayFilled<need||keithFilled<need){
+    warn.textContent=`Fill in all ${need} holes for both players (Ray ${rayFilled}/${need}, Keith ${keithFilled}/${need}).`;
+    return;
+  }
+
+  const rayArr='['+ray.join(',')+']';
+  const keithArr='['+keith.join(',')+']';
+  let block;
+  if(is18){
+    block=`  {\n    date:"${date}", type:18,\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+  }else{
+    const nine=nineSel.value;
+    const parOv = nine==='Front' ? 'PAR_FRONT' : '[4,4,4,4,5,3,3,4,4]';
+    block=`  {\n    date:"${date}", type:9, nine:"${nine}",\n    parOverride:${parOv},\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+  }
+  document.getElementById('code').textContent=block;
+  document.getElementById('outPanel').style.display='block';
+
+  // calc note
+  const rt=sum(ray), kt=sum(keith);
+  const d = s => Math.round(((s-68.2)*113/115)*10)/10;
+  let note;
+  if(is18){
+    const w = rt<kt?`Ray by ${kt-rt}`:(kt<rt?`Keith by ${rt-kt}`:'all square');
+    note=`Ray ${rt}, Keith ${kt} (${w}). Ray's 18-hole differential for this round: ${d(rt).toFixed(1)}.`;
+  }else{
+    const w = rt<kt?`Ray by ${kt-rt}`:(kt<rt?`Keith by ${rt-kt}`:'all square');
+    note=`Ray ${rt}, Keith ${kt} over 9 (${w}). This nine pairs with the next unpaired nine to form an 18-hole differential — the page handles that automatically.`;
+  }
+  document.getElementById('calcNote').textContent=note;
+  document.getElementById('outPanel').scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+document.getElementById('copy').addEventListener('click',async()=>{
+  const txt=document.getElementById('code').textContent;
+  try{
+    await navigator.clipboard.writeText(txt);
+    document.getElementById('copied').textContent='Copied ✓';
+    setTimeout(()=>document.getElementById('copied').textContent='',2000);
+  }catch(e){
+    document.getElementById('copied').textContent='Select and copy manually';
+  }
+});
+
+buildInputs();
+</script>
+</body>
+</html>
