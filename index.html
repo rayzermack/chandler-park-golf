@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chandler Park 2026 — Scorecards</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+
+  :root{
+    --green:#0f3d2e;
+    --green-deep:#0a2c21;
+    --green-line:#2c5a48;
+    --cream:#f3efe2;
+    --cream-dim:#cdd8cc;
+    --gold:#c8a24a;
+    --bogey:#e8e2cf;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:#081a13;
+    font-family:'EB Garamond',Georgia,serif;
+    color:var(--cream);
+    padding:32px 16px 56px;
+  }
+  .page-head{
+    text-align:center;
+    max-width:1120px;
+    margin:0 auto 28px;
+  }
+  .page-head .kicker{
+    font-family:'EB Garamond',serif;
+    letter-spacing:.42em;
+    text-transform:uppercase;
+    font-size:.72rem;
+    color:var(--gold);
+    margin-bottom:10px;
+  }
+  .page-head h1{
+    font-family:'Playfair Display',serif;
+    font-weight:800;
+    font-size:2.1rem;
+    margin:0;
+    color:var(--cream);
+  }
+  .page-head p{
+    color:var(--cream-dim);
+    font-size:.95rem;
+    margin:8px auto 0;
+    max-width:640px;
+    font-style:italic;
+  }
+
+  .card{
+    max-width:1120px;
+    margin:0 auto 30px;
+    background:var(--green);
+    border:2px solid var(--green-line);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:0 10px 34px rgba(0,0,0,.4);
+  }
+  .card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 26px 14px;
+    background:linear-gradient(180deg,var(--green-deep),var(--green));
+    border-bottom:2px solid var(--green-line);
+  }
+  .badge{
+    display:flex;align-items:center;gap:14px;
+  }
+  .tee-mark{
+    width:52px;height:52px;flex:none;
+    border:2px solid var(--gold);
+    border-radius:50%;
+    display:grid;place-items:center;
+    color:var(--gold);
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    position:relative;
+  }
+  .tee-mark span{font-size:.62rem;letter-spacing:.14em;}
+  .card-title{
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    font-size:1.7rem;
+    letter-spacing:.03em;
+    line-height:1;
+  }
+  .card-date{
+    font-size:.82rem;
+    color:var(--gold);
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    margin-top:6px;
+  }
+  .card-meta{
+    text-align:right;
+    font-style:italic;
+    color:var(--cream-dim);
+    font-size:.88rem;
+    line-height:1.5;
+  }
+  .card-meta b{color:var(--cream);font-style:normal;font-weight:500;}
+
+  .scroll{overflow-x:auto;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:760px;
+  }
+  th,td{
+    border:1px solid var(--green-line);
+    text-align:center;
+    padding:9px 4px;
+    font-size:1.05rem;
+  }
+  th.row-label,td.row-label{
+    text-align:left;
+    padding-left:20px;
+    white-space:nowrap;
+    font-variant:small-caps;
+    letter-spacing:.08em;
+    font-size:.9rem;
+    width:92px;
+    color:var(--cream-dim);
+  }
+  thead th{
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    font-size:1.15rem;
+    background:var(--green-deep);
+    color:var(--cream);
+  }
+  thead th.tot{color:var(--gold);}
+  .par-row td{color:var(--cream-dim);font-size:.98rem;}
+  .par-row .row-label{color:var(--cream-dim);}
+  .tot-cell{
+    font-family:'Playfair Display',serif;
+    font-weight:700;
+    font-size:1.25rem;
+    color:var(--gold);
+    background:var(--green-deep);
+  }
+
+  /* score box states */
+  .sc{position:relative;font-family:'EB Garamond',serif;font-weight:500;}
+  .box{
+    display:inline-grid;place-items:center;
+    width:30px;height:30px;line-height:1;
+    position:relative;
+  }
+  /* bogey: single square */
+  .bogey .box{border:1.5px solid var(--cream);}
+  /* double bogey: double square */
+  .dbl .box{border:1.5px solid var(--cream);box-shadow:0 0 0 3px var(--green),0 0 0 4.5px var(--cream);}
+  /* triple+ : triple square */
+  .trp .box{border:1.5px solid var(--cream);
+    box-shadow:0 0 0 3px var(--green),0 0 0 4.5px var(--cream),0 0 0 6px var(--green),0 0 0 7.5px var(--cream);}
+  /* birdie: circle */
+  .birdie .box{border:1.5px solid var(--gold);border-radius:50%;color:var(--gold);}
+  /* eagle: double circle */
+  .eagle .box{border:1.5px solid var(--gold);border-radius:50%;color:var(--gold);
+    box-shadow:0 0 0 3px var(--green),0 0 0 4.5px var(--gold);}
+
+  /* summary card */
+  .summary{
+    max-width:1120px;margin:0 auto 30px;
+    background:linear-gradient(180deg,var(--green-deep),var(--green));
+    border:2px solid var(--gold);
+    border-radius:6px;
+    box-shadow:0 10px 34px rgba(0,0,0,.45);
+    overflow:hidden;
+  }
+  .summary-head{
+    display:flex;align-items:center;gap:14px;
+    padding:18px 26px 14px;
+    border-bottom:1px solid var(--green-line);
+  }
+  .summary-head .tee-mark{border-color:var(--gold);}
+  .summary-head h2{
+    font-family:'Playfair Display',serif;font-weight:800;
+    font-size:1.55rem;margin:0;color:var(--cream);letter-spacing:.02em;
+  }
+  .summary-head .sub{color:var(--gold);font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;margin-top:5px;}
+  .summary-body{
+    display:grid;grid-template-columns:1.15fr 1fr;gap:0;
+  }
+  .summary-body > div{padding:22px 26px;}
+  .summary-body .left{border-right:1px solid var(--green-line);}
+  .summary h3{
+    font-variant:small-caps;letter-spacing:.12em;font-size:.9rem;
+    color:var(--gold);margin:0 0 14px;font-weight:500;font-family:'EB Garamond',serif;
+  }
+  .stat-tbl{width:100%;border-collapse:collapse;}
+  .stat-tbl td{border:none;padding:6px 4px;font-size:1.02rem;text-align:left;}
+  .stat-tbl td.n{text-align:right;font-family:'Playfair Display',serif;color:var(--cream);}
+  .stat-tbl tr + tr td{border-top:1px solid var(--green-line);}
+  .stat-tbl .win td.n{color:var(--gold);}
+  .bigstat{display:flex;gap:30px;margin-bottom:20px;flex-wrap:wrap;}
+  .bigstat .b{flex:1;min-width:120px;}
+  .bigstat .num{font-family:'Playfair Display',serif;font-weight:800;font-size:2.5rem;color:var(--gold);line-height:1;}
+  .bigstat .lbl{color:var(--cream-dim);font-size:.82rem;font-style:italic;margin-top:6px;}
+  .idx-note{color:var(--cream-dim);font-size:.86rem;font-style:italic;line-height:1.55;margin:14px 0 0;}
+  .diff-list{list-style:none;padding:0;margin:10px 0 0;color:var(--cream);font-size:.98rem;}
+  .diff-list li{display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--green-line);}
+  .diff-list li span:last-child{font-family:'Playfair Display',serif;color:var(--gold);}
+  @media(max-width:640px){.summary-body{grid-template-columns:1fr;} .summary-body .left{border-right:none;border-bottom:1px solid var(--green-line);}}
+
+  .legend{
+    max-width:1120px;margin:26px auto 0;
+    display:flex;flex-wrap:wrap;gap:22px;
+    justify-content:center;
+    color:var(--cream-dim);font-size:.82rem;
+    padding-top:20px;border-top:1px solid var(--green-line);
+  }
+  .legend div{display:flex;align-items:center;gap:9px;}
+  .lg{width:22px;height:22px;display:inline-grid;place-items:center;flex:none;font-size:.8rem;color:var(--cream);}
+  .lg.b{border:1.4px solid var(--cream);}
+  .lg.d{border:1.4px solid var(--cream);box-shadow:0 0 0 2px #081a13,0 0 0 3px var(--cream);}
+  .lg.t{border:1.4px solid var(--cream);box-shadow:0 0 0 2px #081a13,0 0 0 3px var(--cream),0 0 0 4px #081a13,0 0 0 5px var(--cream);}
+  .lg.c{border:1.4px solid var(--gold);border-radius:50%;color:var(--gold);}
+
+  @media(max-width:600px){
+    .card-title{font-size:1.3rem;}
+    .page-head h1{font-size:1.6rem;}
+    .card-head{flex-direction:column;align-items:flex-start;}
+    .card-meta{text-align:left;}
+  }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="kicker">Golf Detroit · Season Ledger</div>
+  <h1>Chandler Park 2026</h1>
+  <p>Ray vs. Keith — every round carded this season. Squares mark holes over par; circles mark par-breakers.</p>
+</div>
+
+<div id="cards"></div>
+
+<div class="legend">
+  <div><span class="lg c">3</span> Birdie or better</div>
+  <div><span class="lg b">5</span> Bogey</div>
+  <div><span class="lg d">6</span> Double bogey</div>
+  <div><span class="lg t">7</span> Triple+ </div>
+  <div><span style="color:var(--cream)">4</span>&nbsp; Par (no mark)</div>
+</div>
+
+<script>
+const HOLES9 = [1,2,3,4,5,6,7,8,9];
+const HOLES18 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18];
+// Chandler Park Middle tees
+const PAR_FULL = [4,5,4,4,3,5,3,4,4, 4,4,4,4,5,3,3,4,4]; // 36 / 35 = 71
+const PAR_FRONT = PAR_FULL.slice(0,9);
+
+const rounds = [
+  {
+    date:"July 31, 2026", type:18,
+    ray:[4,7,7,6,6,9,5,5,7, 7,6,6,4,7,5,5,4,7],
+    keith:[6,8,8,7,6,6,6,7,8, 6,4,7,7,7,3,6,6,10],
+  },
+  {
+    date:"August 5, 2026", type:9, nine:"Back",
+    // played as a back nine; par uses the back-nine par set
+    parOverride:[4,4,4,4,5,3,3,4,4],
+    ray:[6,6,5,5,5,6,6,4,6],
+    keith:[4,5,6,8,8,4,3,5,5],
+  },
+  {
+    date:"August 12, 2026", type:18,
+    ray:[5,7,7,4,3,5,4,5,6, 5,7,6,6,7,4,5,6,6],
+    keith:[5,8,6,4,4,8,3,6,8, 7,8,8,6,9,4,7,5,7],
+  },
+  {
+    date:"August 14, 2026", type:18,
+    ray:[9,8,5,4,3,6,5,7,7, 5,5,7,7,8,4,6,5,5],
+    keith:[7,9,7,7,7,7,7,6,7, 7,6,6,6,9,6,4,6,6],
+  },
+  {
+    date:"August 20, 2026", type:9, nine:"Front",
+    parOverride:PAR_FRONT,
+    ray:[6,6,8,6,4,6,3,4,4],
+    keith:[8,8,9,7,7,9,4,6,6],
+  },
+];
+
+function classFor(score,par){
+  const d = score - par;
+  if(d <= -2) return "eagle";
+  if(d === -1) return "birdie";
+  if(d === 0) return "";
+  if(d === 1) return "bogey";
+  if(d === 2) return "dbl";
+  return "trp";
+}
+
+function cell(score,par){
+  const cls = classFor(score,par);
+  return `<td class="sc ${cls}"><span class="box">${score}</span></td>`;
+}
+
+function buildRow(label,scores,pars,total,extraClass=""){
+  let html = `<tr class="${extraClass}"><td class="row-label">${label}</td>`;
+  scores.forEach((s,i)=> html += cell(s,pars[i]));
+  html += `<td class="tot-cell">${total}</td></tr>`;
+  return html;
+}
+
+function buildParRow(pars,totalPar){
+  let html = `<tr class="par-row"><td class="row-label">Par</td>`;
+  pars.forEach(p=> html += `<td>${p}</td>`);
+  html += `<td class="tot-cell">${totalPar}</td></tr>`;
+  return html;
+}
+
+function buildHeader(holes){
+  let html = `<tr><th class="row-label">Hole</th>`;
+  holes.forEach(h=> html += `<th>${h}</th>`);
+  html += `<th class="tot">Tot</th></tr>`;
+  return html;
+}
+
+const sum = a => a.reduce((x,y)=>x+y,0);
+
+const container = document.getElementById("cards");
+
+// ---- Ray handicap summary ----
+(function buildRaySummary(){
+  const diff18 = s => Math.round(((s-68.2)*113/115)*10)/10;
+
+  const r_jul31 = sum(rounds[0].ray); // 18
+  const r_aug5  = sum(rounds[1].ray); // 9
+  const r_aug12 = sum(rounds[2].ray); // 18
+  const r_aug14 = sum(rounds[3].ray); // 18
+  const r_aug20 = sum(rounds[4].ray); // 9
+  const r_pair  = r_aug5 + r_aug20;
+
+  const eighteens = rounds.filter(r=>r.type===18);
+  const rayBest18 = Math.min(...eighteens.map(r=>sum(r.ray)));
+
+  const diffs = [
+    {label:`July 31 · ${r_jul31}`, v:diff18(r_jul31)},
+    {label:`Aug 12 · ${r_aug12}`, v:diff18(r_aug12)},
+    {label:`Aug 14 · ${r_aug14}`, v:diff18(r_aug14)},
+    {label:`Aug 5 + Aug 20 · ${r_pair}`, v:diff18(r_pair)},
+  ].sort((a,b)=>a.v-b.v);
+  const lowest = diffs[0].v;
+  const workingIndex = Math.round((lowest-2.0)*10)/10;
+  const diffItems = diffs.map((d,i)=>`<li><span>${d.label}${i===0?" · low":""}</span><span>${d.v.toFixed(1)}</span></li>`).join("");
+
+  const el = document.createElement("div");
+  el.className = "summary";
+  el.innerHTML = `
+    <div class="summary-head">
+      <div class="tee-mark"><span>CP</span></div>
+      <div>
+        <h2>Ray · Handicap</h2>
+        <div class="sub">2026 · Season to date</div>
+      </div>
+    </div>
+    <div class="summary-body">
+      <div class="left">
+        <div class="bigstat">
+          <div class="b"><div class="num">${workingIndex.toFixed(1)}</div><div class="lbl">Working Handicap Index</div></div>
+          <div class="b"><div class="num">${rayBest18}</div><div class="lbl">Best 18</div></div>
+        </div>
+        <h3>Score differentials</h3>
+        <ul class="diff-list">${diffItems}</ul>
+      </div>
+      <div>
+        <h3>How it's figured</h3>
+        <p class="idx-note">Differential = (Score − 68.2) × 113 ÷ 115, using Chandler Park's Middle tees. Ray's lowest is ${lowest.toFixed(1)}; with this many rounds the index takes the lowest one minus 2.0. His two nine-hole rounds (${r_aug5} + ${r_aug20}) pair into a ${r_pair}. As he logs more rounds the formula averages more of them and the number settles.</p>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+})();
+
+// ---- Keith handicap summary ----
+(function buildKeithSummary(){
+  const diff18 = s => Math.round(((s-68.2)*113/115)*10)/10;
+
+  const k_jul31 = sum(rounds[0].keith); // 18
+  const k_aug5  = sum(rounds[1].keith); // 9
+  const k_aug12 = sum(rounds[2].keith); // 18
+  const k_aug14 = sum(rounds[3].keith); // 18
+  const k_aug20 = sum(rounds[4].keith); // 9
+  const k_pair  = k_aug5 + k_aug20;
+
+  const eighteens = rounds.filter(r=>r.type===18);
+  const keithBest18 = Math.min(...eighteens.map(r=>sum(r.keith)));
+
+  const diffs = [
+    {label:`July 31 · ${k_jul31}`, v:diff18(k_jul31)},
+    {label:`Aug 12 · ${k_aug12}`, v:diff18(k_aug12)},
+    {label:`Aug 14 · ${k_aug14}`, v:diff18(k_aug14)},
+    {label:`Aug 5 + Aug 20 · ${k_pair}`, v:diff18(k_pair)},
+  ].sort((a,b)=>a.v-b.v);
+  const lowest = diffs[0].v;
+  const workingIndex = Math.round((lowest-2.0)*10)/10;
+  const diffItems = diffs.map((d,i)=>`<li><span>${d.label}${i===0?" · low":""}</span><span>${d.v.toFixed(1)}</span></li>`).join("");
+
+  const el = document.createElement("div");
+  el.className = "summary";
+  el.innerHTML = `
+    <div class="summary-head">
+      <div class="tee-mark"><span>CP</span></div>
+      <div>
+        <h2>Keith · Handicap</h2>
+        <div class="sub">2026 · Season to date</div>
+      </div>
+    </div>
+    <div class="summary-body">
+      <div class="left">
+        <div class="bigstat">
+          <div class="b"><div class="num">${workingIndex.toFixed(1)}</div><div class="lbl">Working Handicap Index</div></div>
+          <div class="b"><div class="num">${keithBest18}</div><div class="lbl">Best 18</div></div>
+        </div>
+        <h3>Score differentials</h3>
+        <ul class="diff-list">${diffItems}</ul>
+      </div>
+      <div>
+        <h3>How it's figured</h3>
+        <p class="idx-note">Differential = (Score − 68.2) × 113 ÷ 115, using Chandler Park's Middle tees. Keith's lowest is ${lowest.toFixed(1)}; with this many rounds the index takes the lowest one minus 2.0. His two nine-hole rounds (${k_aug5} + ${k_aug20}) pair into a ${k_pair}. As he logs more rounds the formula averages more of them and the number settles.</p>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+})();
+
+rounds.forEach(r=>{
+  const is18 = r.type === 18;
+  const holes = is18 ? HOLES18 : HOLES9;
+  const pars = is18 ? PAR_FULL : r.parOverride;
+  const totalPar = sum(pars);
+  const rayTot = sum(r.ray);
+  const keithTot = sum(r.keith);
+  const nineLabel = r.type===9 ? ` · ${r.nine} 9` : "";
+  const holeLabel = is18 ? "18 holes" : "9 holes";
+  const winner = rayTot < keithTot ? "Ray" : (keithTot < rayTot ? "Keith" : "Tied");
+  const margin = Math.abs(rayTot-keithTot);
+  const marginTxt = winner==="Tied" ? "All square" : `${winner} by ${margin}`;
+
+  const card = document.createElement("div");
+  card.className = "card";
+  card.innerHTML = `
+    <div class="card-head">
+      <div class="badge">
+        <div class="tee-mark"><span>CP</span></div>
+        <div>
+          <div class="card-title">Chandler Park</div>
+          <div class="card-date">${r.date}${nineLabel}</div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <b>${holeLabel}</b> · Par ${totalPar}<br>
+        Middle tees · 68.2 / 115<br>
+        ${marginTxt}
+      </div>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead>${buildHeader(holes)}</thead>
+        <tbody>
+          ${buildParRow(pars,totalPar)}
+          ${buildRow("Ray",r.ray,pars,rayTot)}
+          ${buildRow("Keith",r.keith,pars,keithTot)}
+        </tbody>
+      </table>
+    </div>
+  `;
+  container.appendChild(card);
+});
+</script>
+
+</body>
+</html>
