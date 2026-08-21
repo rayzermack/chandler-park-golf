@@ -209,6 +209,17 @@
   .diff-list{list-style:none;padding:0;margin:10px 0 0;color:var(--cream);font-size:.98rem;}
   .diff-list li{display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid var(--green-line);}
   .diff-list li span:last-child{font-family:'Playfair Display',serif;color:var(--gold);}
+
+  .bd-tbl{width:100%;border-collapse:collapse;}
+  .bd-tbl th{font-family:'EB Garamond',serif;font-variant:small-caps;letter-spacing:.08em;
+    color:var(--cream-dim);font-size:.9rem;font-weight:400;text-align:right;padding:6px 8px;border:none;background:none;}
+  .bd-tbl th:first-child{text-align:left;}
+  .bd-tbl td{border:none;padding:9px 8px;font-size:1.02rem;text-align:right;}
+  .bd-tbl tr + tr td{border-top:1px solid var(--green-line);}
+  .bd-label{text-align:left !important;display:flex;align-items:center;gap:10px;color:var(--cream);}
+  .bd-n{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--cream);}
+  .bd-n.lead{color:var(--gold);}
+  .lg.p{border:1.4px solid var(--cream-dim);border-radius:2px;}
   @media(max-width:640px){.summary-body{grid-template-columns:1fr;} .summary-body .left{border-right:none;border-bottom:1px solid var(--green-line);}}
 
   .legend{
@@ -427,6 +438,80 @@ const container = document.getElementById("cards");
       <div>
         <h3>How it's figured</h3>
         <p class="idx-note">Differential = (Score − 68.2) × 113 ÷ 115, using Chandler Park's Middle tees. Keith's lowest is ${lowest.toFixed(1)}; with this many rounds the index takes the lowest one minus 2.0. His two nine-hole rounds (${k_aug5} + ${k_aug20}) pair into a ${k_pair}. As he logs more rounds the formula averages more of them and the number settles.</p>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+})();
+
+// ---- Scoring breakdown (pars, bogeys, etc.) ----
+(function buildBreakdown(){
+  function parsFor(r){
+    if(r.type===18) return PAR_FULL;
+    return r.parOverride;
+  }
+  function tally(who){
+    const t={eagle:0,birdie:0,par:0,bogey:0,dbl:0,trp:0,holes:0,over:0};
+    rounds.forEach(r=>{
+      const pars=parsFor(r);
+      r[who].forEach((s,i)=>{
+        const d=s-pars[i];
+        t.holes++; t.over+=d;
+        if(d<=-2)t.eagle++;
+        else if(d===-1)t.birdie++;
+        else if(d===0)t.par++;
+        else if(d===1)t.bogey++;
+        else if(d===2)t.dbl++;
+        else t.trp++;
+      });
+    });
+    return t;
+  }
+  const ray=tally('ray'), keith=tally('keith');
+
+  const rows=[
+    {label:'Birdie or better', key:'good', r:ray.birdie+ray.eagle, k:keith.birdie+keith.eagle, mark:'c'},
+    {label:'Par', key:'par', r:ray.par, k:keith.par, mark:'p'},
+    {label:'Bogey', key:'bogey', r:ray.bogey, k:keith.bogey, mark:'b'},
+    {label:'Double bogey', key:'dbl', r:ray.dbl, k:keith.dbl, mark:'d'},
+    {label:'Triple or worse', key:'trp', r:ray.trp, k:keith.trp, mark:'t'},
+  ];
+
+  const bodyRows=rows.map(row=>{
+    const rLead = row.r>row.k ? 'lead' : '';
+    const kLead = row.k>row.r ? 'lead' : '';
+    return `<tr>
+      <td class="bd-label"><span class="lg ${row.mark}"></span>${row.label}</td>
+      <td class="bd-n ${rLead}">${row.r}</td>
+      <td class="bd-n ${kLead}">${row.k}</td>
+    </tr>`;
+  }).join("");
+
+  const el=document.createElement("div");
+  el.className="summary";
+  el.innerHTML=`
+    <div class="summary-head">
+      <div class="tee-mark"><span>CP</span></div>
+      <div>
+        <h2>Scoring Breakdown</h2>
+        <div class="sub">2026 · ${ray.holes} holes each</div>
+      </div>
+    </div>
+    <div class="summary-body">
+      <div class="left">
+        <h3>Holes by result</h3>
+        <table class="bd-tbl">
+          <thead><tr><th></th><th>Ray</th><th>Keith</th></tr></thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+      </div>
+      <div>
+        <h3>The shape of it</h3>
+        <div class="bigstat">
+          <div class="b"><div class="num">${ray.par+ray.birdie+ray.eagle}</div><div class="lbl">Ray · pars or better</div></div>
+          <div class="b"><div class="num">${keith.par+keith.birdie+keith.eagle}</div><div class="lbl">Keith · pars or better</div></div>
+        </div>
+        <p class="idx-note">Across ${ray.holes} holes, Ray has carded ${ray.par} pars to Keith's ${keith.par}. Neither has made a birdie yet — the 134-yard 7th and the short par-3s are the best bets to break through. Ray's misses cluster at bogey and double (${ray.bogey}+${ray.dbl}); Keith's biggest leak is triple-or-worse (${keith.trp} holes), which is where the scoring gap really lives.</p>
       </div>
     </div>
   `;
