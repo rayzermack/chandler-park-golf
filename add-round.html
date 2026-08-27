@@ -77,6 +77,13 @@
     <h2>Round details</h2>
     <div class="controls">
       <div class="field">
+        <label for="course">Course</label>
+        <select id="course">
+          <option value="Chandler Park">Chandler Park</option>
+          <option value="Silver Lake">Silver Lake</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="date">Date</label>
         <input type="text" id="date" placeholder="e.g. August 27, 2026">
       </div>
@@ -89,6 +96,7 @@
         <select id="nine"><option value="Front">Front</option><option value="Back">Back</option></select>
       </div>
     </div>
+    <p class="note" id="courseNote" style="margin:-6px 0 16px;">Chandler Park is an 18-hole course (par 71). Silver Lake is a 9-hole course (par 36). Playing somewhere new? Tell Claude the course and its rating/slope and it'll be added.</p>
 
     <div class="player-block">
       <div class="name">Ray</div>
@@ -127,22 +135,34 @@
 </div>
 
 <script>
-const PAR_FULL=[4,5,4,4,3,5,3,4,4,4,4,4,4,5,3,3,4,4];
-const PAR_FRONT=PAR_FULL.slice(0,9);
-const PAR_BACK=PAR_FULL.slice(9);
+// Course library — mirror of the one in index.html. Add a course here when
+// you add it there.
+const COURSES={
+  "Chandler Park":{ holes:18, par18:[4,5,4,4,3,5,3,4,4,4,4,4,4,5,3,3,4,4] },
+  "Silver Lake":{ holes:9, par9:[4,4,5,4,3,4,4,3,5] },
+};
 
+const courseSel=document.getElementById('course');
 const typeSel=document.getElementById('type');
 const nineField=document.getElementById('nineField');
 const nineSel=document.getElementById('nine');
 const warn=document.getElementById('warn');
 
+function currentCourse(){ return COURSES[courseSel.value]; }
+
 function currentPars(){
-  if(typeSel.value==='18') return PAR_FULL;
-  return nineSel.value==='Front'?PAR_FRONT:PAR_BACK;
+  const c=currentCourse();
+  if(typeSel.value==='18'){
+    return c.par18 || c.par9; // 9-hole course can't really be 18, falls back
+  }
+  if(c.par18){
+    return nineSel.value==='Front'? c.par18.slice(0,9) : c.par18.slice(9);
+  }
+  return c.par9;
 }
 function holeNumbers(){
   if(typeSel.value==='18') return Array.from({length:18},(_,i)=>i+1);
-  return nineSel.value==='Front'?[1,2,3,4,5,6,7,8,9]:[10,11,12,13,14,15,16,17,18];
+  return nineSel.value==='Back'?[10,11,12,13,14,15,16,17,18]:[1,2,3,4,5,6,7,8,9];
 }
 
 function buildInputs(){
@@ -194,6 +214,21 @@ function recalc(){
   });
 }
 
+function syncCourseConstraints(){
+  const c=currentCourse();
+  // A 9-hole course can only log 9-hole rounds.
+  if(c.holes===9){
+    typeSel.value='9';
+    typeSel.disabled=true;
+  } else {
+    typeSel.disabled=false;
+  }
+  nineField.style.display = typeSel.value==='9'?'flex':'none';
+}
+courseSel.addEventListener('change',()=>{
+  syncCourseConstraints();
+  buildInputs();
+});
 typeSel.addEventListener('change',()=>{
   nineField.style.display = typeSel.value==='9'?'flex':'none';
   buildInputs();
@@ -224,13 +259,13 @@ document.getElementById('gen').addEventListener('click',()=>{
 
   const rayArr='['+ray.join(',')+']';
   const keithArr='['+keith.join(',')+']';
+  const course=courseSel.value;
   let block;
   if(is18){
-    block=`  {\n    date:"${date}", type:18,\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+    block=`  {\n    course:"${course}", date:"${date}", type:18,\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
   }else{
     const nine=nineSel.value;
-    const parOv = nine==='Front' ? 'PAR_FRONT' : '[4,4,4,4,5,3,3,4,4]';
-    block=`  {\n    date:"${date}", type:9, nine:"${nine}",\n    parOverride:${parOv},\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+    block=`  {\n    course:"${course}", date:"${date}", type:9, nine:"${nine}",\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
   }
   document.getElementById('code').textContent=block;
   document.getElementById('outPanel').style.display='block';
@@ -261,6 +296,7 @@ document.getElementById('copy').addEventListener('click',async()=>{
   }
 });
 
+syncCourseConstraints();
 buildInputs();
 </script>
 </body>
