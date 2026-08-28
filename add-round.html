@@ -111,6 +111,10 @@
     </div>
 
     <div class="warn" id="warn"></div>
+    <div class="field" style="margin-bottom:16px;">
+      <label for="note">Note (optional)</label>
+      <input type="text" id="note" placeholder="e.g. Played after a 2-hour Topgolf session" style="min-width:320px;">
+    </div>
     <div class="btn-row">
       <button class="btn" id="gen">Generate code block</button>
       <button class="btn ghost" id="clear">Clear scores</button>
@@ -260,12 +264,14 @@ document.getElementById('gen').addEventListener('click',()=>{
   const rayArr='['+ray.join(',')+']';
   const keithArr='['+keith.join(',')+']';
   const course=courseSel.value;
+  const noteVal=document.getElementById('note').value.trim();
+  const noteLine = noteVal ? `\n    note:${JSON.stringify(noteVal)},` : '';
   let block;
   if(is18){
-    block=`  {\n    course:"${course}", date:"${date}", type:18,\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+    block=`  {\n    course:"${course}", date:"${date}", type:18,\n    ray:${rayArr},\n    keith:${keithArr},${noteLine}\n  },`;
   }else{
     const nine=nineSel.value;
-    block=`  {\n    course:"${course}", date:"${date}", type:9, nine:"${nine}",\n    ray:${rayArr},\n    keith:${keithArr},\n  },`;
+    block=`  {\n    course:"${course}", date:"${date}", type:9, nine:"${nine}",\n    ray:${rayArr},\n    keith:${keithArr},${noteLine}\n  },`;
   }
   document.getElementById('code').textContent=block;
   document.getElementById('outPanel').style.display='block';

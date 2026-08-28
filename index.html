@@ -239,6 +239,9 @@
   .visitor-wrap{max-width:1120px;margin:22px auto 0;text-align:center;padding-top:18px;border-top:1px solid var(--green-line);}
   .visitor-badge{height:26px;opacity:.9;}
 
+  .card-note{padding:12px 26px 16px;color:var(--cream-dim);font-style:italic;font-size:.9rem;border-top:1px solid var(--green-line);display:flex;align-items:center;gap:9px;}
+  .card-note .tg{color:var(--gold);font-style:normal;font-variant:small-caps;letter-spacing:.08em;font-size:.8rem;flex:none;}
+
   @media(max-width:600px){
     .card-title{font-size:1.3rem;}
     .page-head h1{font-size:1.6rem;}
@@ -342,14 +345,16 @@ const rounds = [
     keith:[8,8,9,7,7,9,4,6,6],
   },
   {
-    course:"Silver Lake", date:"August 21, 2026", type:9, nine:"Front",
+    course:"Silver Lake", date:"August 25, 2026", type:9, nine:"Front",
     ray:[5,4,7,6,4,6,5,4,6],
     keith:[8,7,9,8,7,7,8,5,6],
+    note:"Played right after a 2-hour Topgolf session.",
   },
-    {
-    course:"Silver Lake", date:"Aug 28, 2026", type:9, nine:"Front",
-    ray:[8,6,8,5,5,5,6,5,5],
+  {
+    course:"Silver Lake", date:"August 28, 2026", type:9, nine:"Front",
+    ray:[8,6,8,6,5,5,6,5,5],
     keith:[8,7,10,9,8,5,5,4,8],
+    note:"Played right after a 2-hour Topgolf session.",
   },
 ];
 
@@ -537,7 +542,7 @@ handicapCard("Keith","keith");
 })();
 
 // ---- Round scorecards --------------------------------------------------
-rounds.forEach(r=>{
+[...rounds].reverse().forEach(r=>{
   const c = COURSES[r.course];
   const is18 = r.type === 18;
   const pars = parsForRound(r);
@@ -551,6 +556,7 @@ rounds.forEach(r=>{
   const winner = rayTot < keithTot ? "Ray" : (keithTot < rayTot ? "Keith" : "Tied");
   const margin = Math.abs(rayTot-keithTot);
   const marginTxt = winner==="Tied" ? "All square" : `${winner} by ${margin}`;
+  const noteHtml = r.note ? `<div class="card-note"><span class="tg">Note</span>${r.note}</div>` : "";
 
   const card = document.createElement("div");
   card.className = "card";
@@ -579,6 +585,7 @@ rounds.forEach(r=>{
         </tbody>
       </table>
     </div>
+    ${noteHtml}
   `;
   container.appendChild(card);
 });
