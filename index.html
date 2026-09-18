@@ -310,6 +310,11 @@ const COURSES = {
     rating9:34.9, slope9:125,     // published (Blue-tee) figure — see note
     ratingNote:"rating/slope shown is the course's published back-tee figure",
   },
+  "Hampton Golf Club": {
+    abbr:"HGC", tees:"White",
+    par9:[3,4,4,4,3,3,4,4,4], // 33
+    rating9:30.5, slope9:111,     // published White-tee figure (rating 30.5 / slope 111)
+  },
 };
 
 // Resolve the par array a round should use.
@@ -386,6 +391,11 @@ const rounds = [
     course:"Chandler Park", date:"September 17, 2026", type:18,
     ray:[6,6,7,4,4,6,5,6,6, 4,6,6,7,7,5,6,8,5],
     keith:[6,6,6,5,6,7,6,5,5, 6,7,6,8,9,5,5,7,7],
+  },
+  {
+    course:"Hampton Golf Club", date:"September 18, 2026", type:9, nine:"Front",
+    ray:[4,5,5,5,6,5,5,9,6],
+    keith:[5,6,5,5,4,6,5,4,5],
   },
 ];
 
