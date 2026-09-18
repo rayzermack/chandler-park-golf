@@ -443,6 +443,10 @@ function bestEighteen(who){
   const e=rounds.filter(r=>r.type===18);
   return e.length? Math.min(...e.map(r=>sum(r[who]))) : "—";
 }
+function bestNine(who){
+  const n=rounds.filter(r=>r.type===9);
+  return n.length? Math.min(...n.map(r=>sum(r[who]))) : "—";
+}
 
 // ---- score-mark helpers ------------------------------------------------
 function classFor(score,par){
@@ -502,6 +506,7 @@ function handicapCard(name, who){
         <div class="bigstat">
           <div class="b"><div class="num">${workingIndex!==null?workingIndex.toFixed(1):"—"}</div><div class="lbl">Working Handicap Index</div></div>
           <div class="b"><div class="num">${bestEighteen(who)}</div><div class="lbl">Best 18</div></div>
+          <div class="b"><div class="num">${bestNine(who)}</div><div class="lbl">Best 9</div></div>
         </div>
         <h3>Score differentials</h3>
         <ul class="diff-list">${diffItems}</ul>
