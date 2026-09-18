@@ -91,6 +91,20 @@
     letter-spacing:.03em;
     line-height:1;
   }
+  .round-num{
+    font-family:'EB Garamond',serif;
+    font-weight:400;
+    font-size:.72rem;
+    font-variant:small-caps;
+    letter-spacing:.12em;
+    color:var(--gold);
+    border:1px solid var(--green-line);
+    border-radius:20px;
+    padding:3px 10px;
+    margin-left:8px;
+    vertical-align:middle;
+    white-space:nowrap;
+  }
   .card-date{
     font-size:.82rem;
     color:var(--gold);
@@ -255,7 +269,7 @@
 <div class="page-head">
   <div class="kicker">Golf Detroit · Season Ledger</div>
   <h1>Ray &amp; Keith · 2026</h1>
-  <p>Every round carded this season, across courses. Squares mark holes over par; circles mark par-breakers.</p>
+  <p>Every round carded this season, across courses — numbered in the order played. Squares mark holes over par; circles mark par-breakers.</p>
 </div>
 
 <div id="cards"></div>
@@ -559,6 +573,8 @@ handicapCard("Keith","keith");
 })();
 
 // ---- Round scorecards --------------------------------------------------
+const totalRounds = rounds.length;
+rounds.forEach((r,i)=>{ r._num = i+1; }); // chronological number, oldest = 1
 [...rounds].reverse().forEach(r=>{
   const c = COURSES[r.course];
   const is18 = r.type === 18;
@@ -582,7 +598,7 @@ handicapCard("Keith","keith");
       <div class="badge">
         <div class="tee-mark"><span>${c.abbr}</span></div>
         <div>
-          <div class="card-title">${r.course}</div>
+          <div class="card-title">${r.course} <span class="round-num">Round ${r._num} of ${totalRounds}</span></div>
           <div class="card-date">${r.date}${nineLabel}</div>
         </div>
       </div>
